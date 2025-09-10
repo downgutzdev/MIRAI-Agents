@@ -10,7 +10,7 @@ router = APIRouter(prefix="/mirai_agents", tags=["mirai_agents"])
 # ====== Schemas ======
 class GuardrailsRequest(BaseModel):
     question: str = Field(..., min_length=1)
-    # extra fields already anticipated for future model/temperature selection (optional)
+    # campos extras já previstos para futura seleção de modelo/temperatura (opcionais)
     model_name: Optional[str] = Field(default="gemini-1.5-flash")
     temperature: Optional[float] = Field(default=0.1, ge=0.0, le=1.0)
 
@@ -21,33 +21,33 @@ class GuardrailsResponse(BaseModel):
 @router.post("/guardrails/ask", response_model=GuardrailsResponse, status_code=status.HTTP_200_OK)
 def ask_guardrails(req: GuardrailsRequest):
     """
-    Executes guardrails analysis and returns structured JSON.
+    Executa a análise de guardrails e retorna JSON estruturado.
     """
     try:
-        # For now, analyze_guardrails uses the default internal model (creative_model).
-        # Fields model_name/temperature are reserved for future use.
+        # Por enquanto, analyze_guardrails usa o modelo padrão interno (creative_model).
+        # Os campos model_name/temperature ficam reservados para evolução.
         out = analyze_guardrails(question=req.question)
 
         if not out:
             raise HTTPException(
                 status_code=status.HTTP_502_BAD_GATEWAY,
-                detail="Empty output from guardrails."
+                detail="Saída vazia do guardrails."
             )
 
-        # Ensure dict (in case analyze_guardrails returns an error string)
+        # Garante dict (se analyze_guardrails retornar string de erro)
         if isinstance(out, str):
             raise HTTPException(
                 status_code=status.HTTP_502_BAD_GATEWAY,
-                detail=f"Guardrails failure: {out}"
+                detail=f"Falha no guardrails: {out}"
             )
 
         return GuardrailsResponse(assessment=out)
 
     except HTTPException:
-        # Important to propagate the exact status/detail already built
+        # Relevante para propagar exatamente o status/detalhe já montado
         raise
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_502_BAD_GATEWAY,
-            detail=f"Guardrails failure: {e}"
+            detail=f"Falha no guardrails: {e}"
         )

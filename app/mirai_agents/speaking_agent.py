@@ -6,18 +6,18 @@ from langchain.prompts import PromptTemplate
 from langchain.schema import HumanMessage, SystemMessage, AIMessage
 from langchain_google_genai import ChatGoogleGenerativeAI
 
-# load .env
+# carregar .env
 load_dotenv(find_dotenv(filename=".env"), override=False)
 
-DEFAULT_SYSTEM = "You are a friendly, clear, and straightforward assistant. Explain in 2–5 sentences when useful."
+DEFAULT_SYSTEM = "Você é um assistente amigável, claro e direto. Explique em 2–5 frases quando útil."
 
 def _default_template():
     return PromptTemplate(
         input_variables=["question", "context_sql"],
         template=(
-            "User question:\n{question}\n"
+            "Pergunta do usuário:\n{question}\n"
             "{context_sql}\n"
-            "Respond in a cordial and objective way."
+            "Responda de forma cordial e objetiva."
         ),
     )
 
@@ -37,7 +37,7 @@ class FriendlyAgent:
             or os.getenv("GOOGLE_GENAI_API_KEY")
         )
         if not api_key:
-            raise RuntimeError("Missing API key. Define GOOGLE_API_KEY or GEMINI_API_KEY in .env")
+            raise RuntimeError("Faltando API key. Defina GOOGLE_API_KEY ou GEMINI_API_KEY no .env")
 
         try:
             self._llm = ChatGoogleGenerativeAI(
@@ -56,9 +56,9 @@ class FriendlyAgent:
 
     def respond(self, question: str, context_sql: Optional[str] = None) -> str:
         if not question or not question.strip():
-            return "Please give me a bit more context."
+            return "Me dá um pouco mais de contexto, por favor?"
 
-        ctx = f"\nSQL Context:\n{context_sql.strip()}" if context_sql else ""
+        ctx = f"\nContexto SQL:\n{context_sql.strip()}" if context_sql else ""
         msg = self.template.format(question=question.strip(), context_sql=ctx)
 
         resp = self._llm.invoke([

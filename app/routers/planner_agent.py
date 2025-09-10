@@ -8,9 +8,9 @@ router = APIRouter(prefix="/mirai_agents", tags=["mirai_agents"])
 
 
 class PlannerRequest(BaseModel):
-    question: str = Field(..., min_length=1, description="Planning request")
-    tema: str = Field(..., min_length=1, description="Lesson topic")
-    context_schema: Optional[str] = Field(None, description="Optional context from the last session")
+    question: str = Field(..., min_length=1, description="Solicitação de planejamento")
+    tema: str = Field(..., min_length=1, description="Tema da aula")
+    context_schema: Optional[str] = Field(None, description="Contexto opcional da última sessão")
     model_name: str = Field("gemini-1.5-flash")
     temperature: float = Field(0.4, ge=0.0, le=1.0)
 
@@ -26,10 +26,10 @@ def plan(req: PlannerRequest):
         out = agent.plan(
             question=req.question,
             tema=req.tema,
-            context_schema=req.context_schema  # ✅ consistent
+            context_schema=req.context_schema  # ✅ consistente
         )
         if not out:
-            raise HTTPException(status_code=502, detail="Empty output from planner.")
+            raise HTTPException(status_code=502, detail="Saída vazia do planner.")
         return PlannerResponse(plan=out)
     except Exception as e:
-        raise HTTPException(status_code=502, detail=f"Planner failure: {e}")
+        raise HTTPException(status_code=502, detail=f"Falha no planner: {e}")

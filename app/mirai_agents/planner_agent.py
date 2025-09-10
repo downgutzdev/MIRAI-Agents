@@ -8,50 +8,50 @@ from langchain.prompts import PromptTemplate
 from langchain.schema import HumanMessage, AIMessage
 from langchain_google_genai import ChatGoogleGenerativeAI
 
-# Load .env
+# Carrega .env
 load_dotenv(".env")
 
-# --- Default schema ---
+# --- SCHEMA padrão ---
 DEFAULT_SCHEMA = """
-Table: alunos
+Tabela: alunos
 - id (int)
 - nome (varchar)
 - idade (int)
 - curso (varchar)
 
-Table: cursos
+Tabela: cursos
 - id (int)
 - nome (varchar)
 - duracao_meses (int)
 
-Table: professores
+Tabela: professores
 - id (int)
 - nome (varchar)
 - especialidade (varchar)
 """
 
-# --- Planner Template ---
+# --- TEMPLATE do Planner ---
 _PLANNER_TEMPLATE = """
-## PLANNER AGENT - LESSON PLAN STRUCTURER
+## AGENTE PLANNER - ESTRUTURADOR DE PLANOS DE AULA
 
-You are an agent specialized in educational planning that creates complete structures for study sessions, detailed lesson plans, and effective teaching methodologies. Always respond in an objective, concise way without unnecessary content.
+Você é um agente especializado em planejamento educacional que cria estruturas completas de sessões de estudo, planos de aula detalhados e metodologias de ensino eficazes. Responda sempre de forma objetiva, curta e sem conteúdo desnecessário.
 
-## EDUCATIONAL CONTEXT:
+## CONTEXTO EDUCACIONAL:
 {context_schema}
 
-## PLANNING REQUEST:
+## SOLICITAÇÃO DE PLANEJAMENTO:
 {question}
 
-## LESSON TOPIC:
+## TEMA DA AULA:
 {tema}
 
-## EXPECTED OUTPUT:
-- Structured and detailed lesson plan
-- Schedule of sessions with defined time
-- Clear and objective methodology
-- Required resources and materials
-- Evaluation criteria
-- Adaptations for different student profiles
+## OUTPUT ESPERADO:
+- Plano de aula estruturado e detalhado
+- Cronograma de sessões com tempo definido
+- Metodologia clara e objetiva
+- Recursos e materiais necessários
+- Critérios de avaliação
+- Adaptações para diferentes perfis de aluno
 """
 
 def _default_prompt() -> PromptTemplate:
@@ -75,9 +75,9 @@ class PlannerAgent:
             or os.getenv("GOOGLE_GENAI_API_KEY")
         )
         if not api_key:
-            raise RuntimeError("Missing API key. Define GOOGLE_API_KEY or GEMINI_API_KEY in .env")
+            raise RuntimeError("API key ausente. Defina GOOGLE_API_KEY ou GEMINI_API_KEY no .env")
 
-        # Try to initialize resiliently
+        # tenta inicializar de forma resiliente
         self._llm = None
         try:
             self._llm = ChatGoogleGenerativeAI(
@@ -95,7 +95,7 @@ class PlannerAgent:
                     google_api_key=api_key,
                 )
             except Exception as e:
-                raise RuntimeError(f"Failed to initialize PlannerAgent: {e}")
+                raise RuntimeError(f"Falha ao inicializar PlannerAgent: {e}")
 
     def plan(self, question: str, tema: str, context_schema: str | None = None) -> str:
         schema_to_use = context_schema.strip() if context_schema else DEFAULT_SCHEMA

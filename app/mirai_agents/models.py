@@ -6,7 +6,7 @@ load_dotenv()
 
 gemini_api_key = os.getenv("GEMINI_API_KEY")
 if not gemini_api_key:
-    raise RuntimeError("API KEY not found")
+    raise RuntimeError ("API KEY não encontrada")
 
 creative_model = ChatGoogleGenerativeAI(
     model="gemini-1.5-flash",

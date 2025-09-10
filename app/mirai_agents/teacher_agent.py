@@ -7,41 +7,41 @@ from langchain.prompts import PromptTemplate
 from langchain.schema import HumanMessage, AIMessage
 from langchain_google_genai import ChatGoogleGenerativeAI
 
-# Load .env
+# Carrega .env
 load_dotenv(".env")
 
 DEFAULT_PLAN = """
-Previous Planner Plan:
-Objectives: Understand the fundamentals of relational databases.
-Content: ER modeling, Normalization, basic SQL.
-Methodology: Lecture + practical exercises.
-Resources: Slides, MySQL database, BRModelo tool.
-Assessment: Practical exercises and quiz.
-Time: 2h (1h theory + 1h practice).
+Plano anterior do Planner:
+Objetivos: Compreender os fundamentos de Banco de Dados relacionais.
+Conteúdo: Modelagem ER, Normalização, SQL básico.
+Metodologia: Aula expositiva + exercícios práticos.
+Recursos: Slides, banco MySQL, ferramenta BRModelo.
+Avaliação: Exercícios práticos e questionário.
+Tempo: 2h (1h teoria + 1h prática).
 """
 
 _TEACHER_TEMPLATE = """
-## TEACHER AGENT - RESPONSIBLE DIGITAL EDUCATOR
+## AGENTE PROFESSOR - EDUCADOR DIGITAL RESPONSÁVEL
 
-You are a specialized teacher agent that applies study plans created by the planner
-and seeks reliable educational content to provide a rich and accurate learning experience.
+Você é um agente professor especializado que aplica planos de estudos elaborados pelo planner
+e busca conteúdos educacionais confiáveis para proporcionar uma experiência de aprendizagem rica e precisa.
 
-## SUBJECT STUDIED:
+## ASSUNTO ESTUDADO:
 {question}
 
-## STUDY PLAN TO BE APPLIED:
+## PLANO DE ESTUDOS A SER APLICADO:
 {plan}
 
-## CONTEXT OF THE LAST SESSION (optional):
+## CONTEXTO DA ÚLTIMA SESSÃO (opcional):
 {context_schema}
 
-## EXPECTED OUTPUT:
-- Lesson structured according to the planner's plan
-- Content verified from multiple sources
-- Clear and objective explanations
-- Practical and relevant examples
-- Student comprehension check
-- Next steps according to the schedule
+## OUTPUT ESPERADO:
+- Aula estruturada conforme o plano do planner
+- Conteúdo verificado em múltiplas fontes
+- Explicações claras e objetivas
+- Exemplos práticos e relevantes
+- Verificação de compreensão do aluno
+- Próximos passos conforme cronograma
 """
 
 def _default_prompt() -> PromptTemplate:
@@ -64,7 +64,7 @@ class TeacherAgent:
             or os.getenv("GOOGLE_GENAI_API_KEY")
         )
         if not api_key:
-            raise RuntimeError("Missing API key. Define GOOGLE_API_KEY or GEMINI_API_KEY in .env")
+            raise RuntimeError("API key ausente. Defina GOOGLE_API_KEY ou GEMINI_API_KEY no .env")
 
         self._llm = None
         try:
@@ -83,14 +83,14 @@ class TeacherAgent:
                     google_api_key=api_key,
                 )
             except Exception as e:
-                raise RuntimeError(f"Failed to initialize TeacherAgent: {e}")
+                raise RuntimeError(f"Falha ao inicializar TeacherAgent: {e}")
 
     def teach(self, question: str, plan: str | None = None, context_schema: str | None = None) -> str:
         plan_to_use = plan.strip() if plan and plan.strip() else DEFAULT_PLAN
         msg = self.template.format(
             question=question or "",
             plan=plan_to_use,
-            context_schema=context_schema or "No previous context"
+            context_schema=context_schema or "Nenhum contexto anterior"
         )
         resp = self._llm.invoke([HumanMessage(content=msg)])
         if isinstance(resp, AIMessage):

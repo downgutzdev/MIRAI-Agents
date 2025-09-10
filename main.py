@@ -1,9 +1,9 @@
-# main.py (at the project root)
+# main.py (na raiz do projeto)
 
 from dotenv import load_dotenv
 from pathlib import Path
 
-# Load .env early (before importing the app)
+# Carrega .env cedo (antes de importar a app)
 load_dotenv(Path(".env"), override=True)
 
 from fastapi import FastAPI
@@ -19,26 +19,26 @@ from app.routers.schema_agent import router as schema_agent_router
 app = FastAPI(
     title="Mirai Agents API",
     version="1.0.0",
-    description="API to orchestrate Mirai project agents"
+    description="API para orquestrar agentes do projeto Mirai"
 )
 
-# CORS configuration (adjust allow_origins in production!)
+# Configuração de CORS (ajuste allow_origins em produção!)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],   # in production define specific domains
+    allow_origins=["*"],   # em produção defina domínios específicos
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# Register routers
+# Registro dos routers
 app.include_router(natural_router)
 app.include_router(guardrails_router)
 app.include_router(planner_router)
 app.include_router(professor_router)
 app.include_router(schema_agent_router)
 
-# Healthcheck endpoint
+# Endpoint de healthcheck
 @app.get("/health", tags=["health"])
 def health():
     return {"status": "ok"}

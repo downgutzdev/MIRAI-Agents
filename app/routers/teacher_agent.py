@@ -2,15 +2,15 @@ from fastapi import APIRouter, HTTPException, status
 from pydantic import BaseModel, Field
 from typing import Optional
 
-from app.mirai_agents.teacher_agent import TeacherAgent  # adjust if the module has another name
+from app.mirai_agents.teacher_agent import TeacherAgent  # ajuste se o módulo tiver outro nome
 
 router = APIRouter(prefix="/mirai_agents", tags=["mirai_agents"])
 
 
 class ProfessorRequest(BaseModel):
-    question: str = Field(..., min_length=1, description="User question or topic to be taught")
-    plan: str = Field(..., min_length=1, description="Study plan to be applied")
-    context_schema: Optional[str] = Field(None, description="Context of the last class (optional)")
+    question: str = Field(..., min_length=1, description="Pergunta do usuário ou tópico a ser ensinado")
+    plan: str = Field(..., min_length=1, description="Plano de estudos a ser aplicado")
+    context_schema: Optional[str] = Field(None, description="Contexto da última aula (opcional)")
     model_name: str = Field("gemini-1.5-flash")
     temperature: float = Field(0.4, ge=0.0, le=1.0)
 
@@ -26,10 +26,10 @@ def teach(req: ProfessorRequest):
         output = agent.teach(
             question=req.question,
             plan=req.plan,
-            context_schema=req.context_schema  # ✅ now passed to Teacher template
+            context_schema=req.context_schema  # ✅ agora vai pro template do Teacher
         )
         if not output:
-            raise HTTPException(status_code=502, detail="Empty output from teacher.")
+            raise HTTPException(status_code=502, detail="Saída vazia do professor.")
         return ProfessorResponse(lesson=output)
     except Exception as e:
-        raise HTTPException(status_code=502, detail=f"Teacher failure: {e}")
+        raise HTTPException(status_code=502, detail=f"Falha no professor: {e}")

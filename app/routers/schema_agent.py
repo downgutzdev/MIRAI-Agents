@@ -6,7 +6,7 @@ from app.mirai_agents.schema_agent import SchemaAgent
 router = APIRouter(prefix="/mirai_agents", tags=["mirai_agents"])
 
 class EvaluationRequest(BaseModel):
-    question: str = Field(..., min_length=1, description="Input with the student's speech or context")
+    question: str = Field(..., min_length=1, description="Entrada com a fala ou contexto do estudante")
     model_name: str = Field("gemini-1.5-flash")
     temperature: float = Field(0.2, ge=0.0, le=1.0)
 
@@ -26,7 +26,7 @@ def evaluate_student(req: EvaluationRequest):
         agent = SchemaAgent(model_name=req.model_name, temperature=req.temperature)
         raw = agent.evaluate(req.question)
 
-        # final safeguard so Pydantic doesn't fail on None values
+        # blindagem final para o Pydantic não explodir
         answer = {
             "strong_points": _as_str(raw.get("strong_points")),
             "weak_points": _as_str(raw.get("weak_points")),
@@ -36,4 +36,4 @@ def evaluate_student(req: EvaluationRequest):
         return EvaluationResponse(**answer)
 
     except Exception as e:
-        raise HTTPException(status_code=502, detail=f"Failed to query agent: {e}")
+        raise HTTPException(status_code=502, detail=f"Falha ao consultar o agente: {e}")
